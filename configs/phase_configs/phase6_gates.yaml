@@ -1,0 +1,75 @@
+# Phase 6: Quality Assurance Gates
+phase: 6
+name: "Final Quality Assurance"
+
+quality_gates:
+  icr_gates:
+    ethics_mention_kappa:
+      threshold: 0.85
+      action_if_failed: "revise_schema_definitions"
+
+    ethics_severity_kappa:
+      threshold: 0.80
+      action_if_failed: "simplify_severity_levels"
+
+    krippendorff_alpha_min:
+      threshold: 0.80
+      action_if_failed: "collapse_multi_select_options"
+
+    icc_continuous:
+      threshold: 0.90
+      action_if_failed: "review_confidence_calculation"
+
+  accuracy_gates:
+    overall_accuracy:
+      threshold: 0.90
+      action_if_failed: "increase_human_review"
+
+    critical_field_accuracy:
+      threshold: 0.95
+      action_if_failed: "mandatory_human_review_critical"
+
+    per_field_minimum:
+      threshold: 0.80
+      action_if_failed: "field_specific_recoding"
+
+  error_gates:
+    hallucination_rate:
+      threshold: 0.02
+      action_if_failed: "increase_human_review_rate"
+
+    extraction_miss_rate:
+      threshold: 0.10
+      action_if_failed: "review_rag_configuration"
+
+    systematic_bias:
+      threshold: 0.05
+      action_if_failed: "field_specific_calibration"
+
+completeness_checks:
+  all_papers_coded: true
+  no_missing_critical_fields: true
+  all_discrepancies_resolved: true
+  audit_trail_complete: true
+
+confidence_calibration:
+  method: "isotonic_regression"
+  validation_split: 0.20
+
+bias_detection:
+  check_per_field: true
+  check_per_ethics_principle: true
+  check_per_hr_function: true
+  directional_bias_threshold: 0.05
+
+final_output:
+  directory: "./data/05_coded/phase6_final"
+  dataset_file: "final_coded_dataset.csv"
+  quality_report: "quality_report.md"
+  calibration_model: "calibration_model.pkl"
+
+reporting:
+  generate_summary: true
+  include_metrics_table: true
+  include_bias_analysis: true
+  format: ["markdown", "json"]

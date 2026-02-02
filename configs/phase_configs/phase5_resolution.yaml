@@ -1,0 +1,62 @@
+# Phase 5: Discrepancy Resolution Protocol
+phase: 5
+name: "Discrepancy Resolution"
+
+resolution_types:
+  ai_ai_discordance:
+    description: "Disagreement between AI models"
+    action: "route_to_human_verification"
+    priority: "high"
+
+  ai_human_disagreement:
+    description: "AI consensus differs from human coding"
+    action: "expert_arbitration"
+    priority: "high"
+
+  human_human_disagreement:
+    description: "Disagreement between human coders"
+    action: "consensus_meeting"
+    priority: "medium"
+    note: "N/A for single researcher - use intra-rater check"
+
+resolution_workflow:
+  step1:
+    name: "Identify discrepancy"
+    action: "Flag papers with disagreement"
+    threshold: "any_field_mismatch"
+
+  step2:
+    name: "Categorize discrepancy"
+    categories:
+      - "factual_extraction_error"
+      - "interpretation_difference"
+      - "schema_ambiguity"
+      - "edge_case"
+
+  step3:
+    name: "Apply resolution"
+    methods:
+      factual_extraction_error: "re_extract_with_context"
+      interpretation_difference: "human_final_decision"
+      schema_ambiguity: "update_codebook_clarification"
+      edge_case: "document_and_decide"
+
+  step4:
+    name: "Document decision"
+    required_fields:
+      - "paper_id"
+      - "field_name"
+      - "original_values"
+      - "final_value"
+      - "resolution_method"
+      - "rationale"
+      - "resolver"
+      - "timestamp"
+
+audit_trail:
+  enabled: true
+  log_file: "./data/05_coded/phase5_resolutions/resolutions_log.json"
+
+output:
+  directory: "./data/05_coded/phase5_resolutions"
+  resolved_file: "resolved_discrepancies.json"

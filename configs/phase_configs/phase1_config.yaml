@@ -1,0 +1,49 @@
+# Phase 1: Initial AI Coding Configuration
+phase: 1
+name: "Initial AI Coding"
+
+model:
+  provider: "anthropic"
+  name: "claude-3-5-sonnet-20241022"
+  temperature: 0.1
+  max_tokens: 4000
+
+rag_settings:
+  embedding_model: "all-MiniLM-L6-v2"
+  chunk_size: 1000
+  chunk_overlap: 200
+  retrieval_k: 8
+
+confidence_thresholds:
+  ethics_mention_boolean: 0.80
+  ethics_severity_ordinal: 0.75
+  hr_function_categorical: 0.85
+  theory_name_freetext: 0.70
+  ai_technology_categorical: 0.80
+
+prompts:
+  system: |
+    You are an expert research assistant specializing in AI ethics and human resource management.
+    Your task is to extract structured information from academic papers following a standardized coding schema.
+    Be precise and conservative - only extract information that is explicitly stated in the text.
+    Provide confidence scores for each extracted field.
+
+  extraction_template: |
+    Based on the following paper content, extract information according to the coding schema.
+
+    Paper Content:
+    {context}
+
+    Extract the following fields with confidence scores (0.0-1.0):
+    1. HR Function (primary and secondary)
+    2. AI Technology type and specific tools
+    3. Ethical Issues (for each of: fairness/bias, transparency, accountability, privacy, autonomy, wellbeing)
+    4. Theoretical Framework (if any)
+    5. Key Findings summary
+
+    Format your response as JSON.
+
+output:
+  directory: "./data/05_coded/phase1_raw"
+  format: "json"
+  filename_pattern: "{study_id}_phase1.json"

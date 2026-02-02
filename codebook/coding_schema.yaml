@@ -1,0 +1,447 @@
+# AI-Ethics-HR Coding Schema v1.0
+# Schema for systematic coding of AI ethics in HR literature
+
+version: "1.0.0"
+last_updated: "2026-02-02"
+description: "Standardized coding schema for AI ethics in human resource management systematic review"
+
+schema:
+  study_metadata:
+    study_id:
+      type: "string"
+      required: true
+      description: "Unique identifier for the study"
+      pattern: "^[A-Z]{3}[0-9]{4}$"
+      example: "SMI2023"
+
+    authors:
+      type: "string"
+      required: true
+      description: "Author names in APA format"
+      example: "Smith, J., & Johnson, M."
+
+    year:
+      type: "integer"
+      required: true
+      min: 2015
+      max: 2025
+      description: "Publication year"
+
+    title:
+      type: "string"
+      required: true
+      description: "Full paper title"
+
+    journal:
+      type: "string"
+      required: true
+      description: "Journal or publication venue name"
+
+    doi:
+      type: "string"
+      required: false
+      pattern: "^10\\.\\d{4,}/.*$"
+      description: "Digital Object Identifier"
+
+    country:
+      type: "string"
+      required: false
+      description: "Country of study or first author affiliation"
+
+    methodology:
+      type: "categorical"
+      required: true
+      multi_select: false
+      options:
+        - value: "empirical_quantitative"
+          description: "Quantitative empirical research (surveys, experiments)"
+        - value: "empirical_qualitative"
+          description: "Qualitative empirical research (interviews, case studies)"
+        - value: "conceptual"
+          description: "Theoretical or conceptual paper"
+        - value: "review"
+          description: "Literature review or meta-analysis"
+        - value: "case_study"
+          description: "In-depth case study"
+        - value: "mixed_methods"
+          description: "Combined quantitative and qualitative methods"
+
+  hr_function:
+    primary:
+      type: "categorical"
+      required: true
+      multi_select: false
+      description: "Primary HR function addressed in the paper"
+      options:
+        - value: "recruitment"
+          description: "Talent acquisition, job posting, candidate sourcing"
+        - value: "selection"
+          description: "Candidate screening, interviewing, hiring decisions"
+        - value: "performance_management"
+          description: "Performance evaluation, feedback, goal setting"
+        - value: "learning_development"
+          description: "Training, skill development, career development"
+        - value: "people_analytics"
+          description: "HR analytics, workforce planning, predictive HR"
+        - value: "employee_relations"
+          description: "Engagement, wellbeing, workplace culture"
+        - value: "workforce_planning"
+          description: "Strategic workforce planning, succession planning"
+        - value: "compensation_benefits"
+          description: "Pay decisions, benefits allocation"
+        - value: "multiple"
+          description: "Paper addresses multiple HR functions equally"
+
+    secondary:
+      type: "categorical"
+      required: false
+      multi_select: true
+      description: "Secondary HR functions if paper covers multiple"
+      options: "same_as_primary"
+
+  ai_technology:
+    type:
+      type: "categorical"
+      required: true
+      multi_select: true
+      description: "Type of AI technology discussed"
+      options:
+        - value: "machine_learning"
+          description: "General ML algorithms for prediction/classification"
+        - value: "nlp"
+          description: "Natural language processing, text analysis"
+        - value: "computer_vision"
+          description: "Image/video analysis, facial recognition"
+        - value: "chatbot"
+          description: "Conversational AI, virtual assistants"
+        - value: "predictive_analytics"
+          description: "Predictive models for HR outcomes"
+        - value: "recommender_system"
+          description: "Recommendation algorithms"
+        - value: "robotic_process_automation"
+          description: "RPA for HR process automation"
+        - value: "generative_ai"
+          description: "LLMs, generative models (e.g., ChatGPT)"
+        - value: "not_specified"
+          description: "AI mentioned generally without specification"
+
+    specific_tool:
+      type: "string"
+      required: false
+      description: "Specific AI tool or platform mentioned"
+      examples:
+        - "HireVue"
+        - "Pymetrics"
+        - "ChatGPT"
+        - "Workday AI"
+        - "LinkedIn Talent Insights"
+
+  ethical_issues:
+    fairness_bias:
+      mentioned:
+        type: "boolean"
+        required: true
+        description: "Does the paper discuss fairness or bias issues?"
+
+      type:
+        type: "categorical"
+        required: false
+        multi_select: true
+        condition: "fairness_bias.mentioned == true"
+        options:
+          - value: "algorithmic_bias"
+            description: "Bias in AI algorithms themselves"
+          - value: "disparate_impact"
+            description: "Disproportionate outcomes for protected groups"
+          - value: "protected_characteristics"
+            description: "Bias related to race, gender, age, disability"
+          - value: "historical_bias"
+            description: "Bias from historical training data"
+          - value: "proxy_discrimination"
+            description: "Indirect discrimination through proxies"
+
+      severity:
+        type: "ordinal"
+        required: false
+        condition: "fairness_bias.mentioned == true"
+        options:
+          - value: "major_focus"
+            level: 4
+            description: "Central theme of the paper"
+          - value: "discussed"
+            level: 3
+            description: "Substantive discussion in the paper"
+          - value: "mentioned"
+            level: 2
+            description: "Brief mention without deep analysis"
+          - value: "not_addressed"
+            level: 1
+            description: "Not discussed despite relevance"
+
+    transparency:
+      mentioned:
+        type: "boolean"
+        required: true
+        description: "Does the paper discuss transparency/explainability?"
+
+      type:
+        type: "categorical"
+        required: false
+        multi_select: true
+        condition: "transparency.mentioned == true"
+        options:
+          - value: "explainability"
+            description: "Ability to explain AI decisions"
+          - value: "black_box"
+            description: "Concerns about opaque algorithms"
+          - value: "interpretability"
+            description: "Understanding how AI works"
+          - value: "communication_to_employees"
+            description: "Informing employees about AI use"
+
+      severity:
+        type: "ordinal"
+        required: false
+        condition: "transparency.mentioned == true"
+        options: "same_as_fairness_bias.severity"
+
+    accountability:
+      mentioned:
+        type: "boolean"
+        required: true
+        description: "Does the paper discuss accountability issues?"
+
+      type:
+        type: "categorical"
+        required: false
+        multi_select: true
+        condition: "accountability.mentioned == true"
+        options:
+          - value: "human_oversight"
+            description: "Need for human supervision of AI"
+          - value: "liability"
+            description: "Legal responsibility for AI decisions"
+          - value: "responsibility"
+            description: "Organizational accountability"
+          - value: "auditability"
+            description: "Ability to audit AI systems"
+
+      severity:
+        type: "ordinal"
+        required: false
+        condition: "accountability.mentioned == true"
+        options: "same_as_fairness_bias.severity"
+
+    privacy:
+      mentioned:
+        type: "boolean"
+        required: true
+        description: "Does the paper discuss privacy concerns?"
+
+      type:
+        type: "categorical"
+        required: false
+        multi_select: true
+        condition: "privacy.mentioned == true"
+        options:
+          - value: "data_collection"
+            description: "Concerns about data being collected"
+          - value: "surveillance"
+            description: "Employee monitoring and surveillance"
+          - value: "consent"
+            description: "Informed consent for data use"
+          - value: "gdpr"
+            description: "GDPR and data protection regulations"
+          - value: "data_minimization"
+            description: "Collecting only necessary data"
+
+      severity:
+        type: "ordinal"
+        required: false
+        condition: "privacy.mentioned == true"
+        options: "same_as_fairness_bias.severity"
+
+    autonomy:
+      mentioned:
+        type: "boolean"
+        required: true
+        description: "Does the paper discuss human autonomy issues?"
+
+      type:
+        type: "categorical"
+        required: false
+        multi_select: true
+        condition: "autonomy.mentioned == true"
+        options:
+          - value: "human_in_the_loop"
+            description: "Maintaining human decision-making role"
+          - value: "deskilling"
+            description: "Loss of human skills due to automation"
+          - value: "agency"
+            description: "Employee agency and control"
+          - value: "decision_authority"
+            description: "Who has final decision authority"
+
+      severity:
+        type: "ordinal"
+        required: false
+        condition: "autonomy.mentioned == true"
+        options: "same_as_fairness_bias.severity"
+
+    wellbeing:
+      mentioned:
+        type: "boolean"
+        required: true
+        description: "Does the paper discuss employee wellbeing?"
+
+      type:
+        type: "categorical"
+        required: false
+        multi_select: true
+        condition: "wellbeing.mentioned == true"
+        options:
+          - value: "job_quality"
+            description: "Impact on job quality and satisfaction"
+          - value: "psychological_safety"
+            description: "Employee psychological safety"
+          - value: "work_intensification"
+            description: "Increased work pressure/intensity"
+          - value: "employee_experience"
+            description: "Overall employee experience"
+
+      severity:
+        type: "ordinal"
+        required: false
+        condition: "wellbeing.mentioned == true"
+        options: "same_as_fairness_bias.severity"
+
+  theoretical_framework:
+    applied:
+      type: "boolean"
+      required: true
+      description: "Does the paper apply a theoretical framework?"
+
+    theory_name:
+      type: "string"
+      required: false
+      condition: "theoretical_framework.applied == true"
+      description: "Name of the theoretical framework used"
+      examples:
+        - "Algorithmic Management Theory"
+        - "Technology Acceptance Model (TAM)"
+        - "Procedural Justice Theory"
+        - "Rawlsian Ethics"
+        - "Stakeholder Theory"
+        - "Sociotechnical Systems Theory"
+
+    framework_category:
+      type: "categorical"
+      required: false
+      condition: "theoretical_framework.applied == true"
+      options:
+        - value: "ethics_frameworks"
+          description: "Ethical theories (deontological, consequentialist)"
+        - value: "hr_theories"
+          description: "HR-specific theories (AMO, HPWS)"
+        - value: "technology_theories"
+          description: "Technology adoption theories (TAM, UTAUT)"
+        - value: "organizational_theories"
+          description: "Organizational behavior theories"
+        - value: "management_theories"
+          description: "Management and strategy theories"
+
+  key_findings:
+    summary:
+      type: "string"
+      required: true
+      max_length: 500
+      description: "2-3 sentence summary of key findings"
+
+    recommendations:
+      type: "string"
+      required: false
+      max_length: 300
+      description: "Practical recommendations from the paper"
+
+    limitations_noted:
+      type: "boolean"
+      required: true
+      description: "Does the paper acknowledge limitations?"
+
+  research_gaps:
+    identified:
+      type: "boolean"
+      required: true
+      description: "Does the paper identify research gaps?"
+
+    gap_description:
+      type: "string"
+      required: false
+      condition: "research_gaps.identified == true"
+      max_length: 300
+      description: "Description of identified research gaps"
+
+  quality_indicators:
+    peer_reviewed:
+      type: "boolean"
+      required: true
+      description: "Is the paper peer-reviewed?"
+
+    empirical_evidence:
+      type: "boolean"
+      required: true
+      description: "Does the paper present empirical evidence?"
+
+    sample_size:
+      type: "string"
+      required: false
+      condition: "empirical_evidence == true"
+      description: "Sample size for empirical studies"
+      example: "N=500"
+
+    geographic_scope:
+      type: "categorical"
+      required: false
+      options:
+        - value: "single_country"
+          description: "Study conducted in one country"
+        - value: "multi_country"
+          description: "Study spans multiple countries"
+        - value: "global"
+          description: "Global or worldwide scope"
+        - value: "not_specified"
+          description: "Geographic scope not specified"
+
+  coding_metadata:
+    coder_id:
+      type: "string"
+      required: true
+      description: "Identifier for who/what coded this paper"
+
+    coding_date:
+      type: "datetime"
+      required: true
+      description: "When coding was completed"
+
+    coding_phase:
+      type: "integer"
+      required: true
+      min: 1
+      max: 6
+      description: "Which phase of coding"
+
+    confidence_scores:
+      type: "object"
+      required: true
+      description: "Per-field confidence scores from AI"
+      fields:
+        hr_function: "float"
+        ai_technology: "float"
+        ethical_issues: "float"
+        theoretical_framework: "float"
+        key_findings: "float"
+
+    notes:
+      type: "string"
+      required: false
+      description: "Additional coding notes or flags"

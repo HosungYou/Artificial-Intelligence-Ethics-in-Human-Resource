@@ -1,0 +1,57 @@
+# Phase 2: Multi-Model Consensus Configuration
+phase: 2
+name: "AI Consensus Coding"
+
+models:
+  model_a:
+    name: "Claude 3.5 Sonnet"
+    provider: "anthropic"
+    model_id: "claude-3-5-sonnet-20241022"
+    role: "primary_extractor"
+    temperature: 0.1
+    cost_per_1k_tokens:
+      input: 0.003
+      output: 0.015
+
+  model_b:
+    name: "GPT-4o"
+    provider: "openai"
+    model_id: "gpt-4o"
+    role: "verification_extractor"
+    temperature: 0.1
+    cost_per_1k_tokens:
+      input: 0.005
+      output: 0.015
+
+  model_c:
+    name: "Llama 3.3 70B"
+    provider: "groq"
+    model_id: "llama-3.3-70b-versatile"
+    role: "efficiency_checker"
+    temperature: 0.1
+    cost_per_1k_tokens:
+      input: 0.00059
+      output: 0.00079
+
+consensus_rules:
+  threshold: "2_of_3"
+  tie_breaker: "model_a"
+
+  critical_fields_require_unanimous:
+    - "ethical_issues.fairness_bias.mentioned"
+    - "ethical_issues.transparency.mentioned"
+    - "hr_function.primary"
+
+  concordance_scoring:
+    exact_match: 1.0
+    partial_match: 0.5
+    no_match: 0.0
+
+discordance_handling:
+  route_to_phase5: true
+  log_all_disagreements: true
+
+output:
+  directory: "./data/05_coded/phase2_consensus"
+  format: "json"
+  filename_pattern: "{study_id}_consensus.json"

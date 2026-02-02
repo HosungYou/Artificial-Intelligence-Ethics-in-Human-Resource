@@ -1,0 +1,67 @@
+# Phase 3: Human Verification Sampling Strategy
+phase: 3
+name: "Human Verification Sampling"
+
+sampling:
+  overall_rate: 0.20
+  minimum_papers: 30
+  maximum_papers: 50
+
+  stratification_dimensions:
+    ethics_principle_coverage:
+      description: "Ensure at least 1 paper per ethics principle"
+      minimum_per_stratum: 1
+      principles:
+        - "fairness_bias"
+        - "transparency"
+        - "accountability"
+        - "privacy"
+        - "autonomy"
+        - "wellbeing"
+
+    hr_function_distribution:
+      description: "Proportional sampling across HR functions"
+      method: "proportional"
+      functions:
+        - "recruitment"
+        - "selection"
+        - "performance_management"
+        - "learning_development"
+        - "people_analytics"
+        - "employee_relations"
+
+    confidence_quartiles:
+      description: "Oversample low-confidence papers"
+      quartiles:
+        Q1: 0.30  # 30% from lowest confidence
+        Q2: 0.25
+        Q3: 0.25
+        Q4: 0.20  # 20% from highest confidence
+
+single_researcher_protocol:
+  enabled: true
+  description: "Adapted protocol for single human coder"
+
+  intra_rater_reliability:
+    enabled: true
+    recode_rate: 0.20
+    time_gap_days: 14
+    target_kappa: 0.90
+
+  ai_as_primary:
+    description: "AI consensus serves as primary coding"
+    human_role: "gold_standard_arbiter"
+
+human_coding:
+  interface: "excel"
+  fields_to_verify:
+    - "hr_function.primary"
+    - "ethical_issues.*.mentioned"
+    - "ethical_issues.*.severity"
+    - "theoretical_framework.applied"
+    - "ai_technology.type"
+
+output:
+  directory: "./data/05_coded/phase3_human"
+  gold_standard_file: "human_gold_standard.xlsx"
+  retest_file: "human_retest_t2.xlsx"

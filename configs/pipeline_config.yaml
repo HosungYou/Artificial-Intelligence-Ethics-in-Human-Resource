@@ -1,0 +1,158 @@
+# AI Ethics in HR - RAG-Enabled Systematic Review Pipeline Configuration
+# Version: 1.0.0
+
+project:
+  name: "AI-Ethics-HR-Review"
+  description: "RAG-Enabled Systematic Literature Review on AI Ethics in Human Resource"
+  version: "1.0.0"
+  created: "2026-02-02"
+
+research:
+  title: "Artificial Intelligence Ethics in Human Resource: A RAG-Enabled Systematic Literature Review"
+  target_journals:
+    - "Human Resource Development Review (HRDR)"
+    - "Human Resource Development Quarterly (HRDQ)"
+    - "Human Resource Development International (HRDI)"
+  research_questions:
+    primary:
+      - "RQ1: What are the key ethical issues associated with AI applications across HR functions?"
+      - "RQ2: How do AI ethics concerns vary across different HR domains?"
+      - "RQ3: What theoretical frameworks have been applied to understand AI ethics in HR?"
+      - "RQ4: What gaps exist in the current literature on AI ethics in HR?"
+    secondary:
+      - "RQ5: How can RAG-enabled systematic review methodology improve literature synthesis?"
+      - "RQ6: What are the accuracy and reliability of AI-assisted coding vs human coding?"
+
+search:
+  databases:
+    primary:
+      - name: "semantic_scholar"
+        api_url: "https://api.semanticscholar.org/graph/v1/paper/search"
+        rate_limit: 100  # requests per 5 minutes
+      - name: "openalex"
+        api_url: "https://api.openalex.org/works"
+        rate_limit: 100000  # requests per day with polite pool
+      - name: "scopus"
+        api_url: "https://api.elsevier.com/content/search/scopus"
+        requires_key: true
+    secondary:
+      - name: "arxiv"
+        api_url: "http://export.arxiv.org/api/query"
+        rate_limit: 20  # 3-second delay between requests
+
+  query:
+    main: |
+      (("artificial intelligence" OR "AI" OR "machine learning" OR "algorithm*"
+       OR "automated" OR "chatbot" OR "NLP" OR "predictive analytics")
+      AND
+      ("human resource*" OR "HR" OR "HRM" OR "talent management"
+       OR "recruitment" OR "selection" OR "hiring" OR "performance management"
+       OR "learning and development" OR "training" OR "workforce analytics"
+       OR "people analytics" OR "employee*")
+      AND
+      ("ethic*" OR "bias" OR "fairness" OR "discrimination" OR "transparency"
+       OR "accountability" OR "privacy" OR "surveillance" OR "trust"
+       OR "responsible AI" OR "algorithmic"))
+
+    filters:
+      year_range: [2015, 2025]
+      language: "en"
+      document_types:
+        - "journal_article"
+        - "conference_paper"
+        - "book_chapter"
+
+  inclusion_criteria:
+    - "Focus on AI/ML applications in HR contexts"
+    - "Addresses ethical implications or concerns"
+    - "Published in peer-reviewed outlets (2015-2025)"
+    - "English language"
+
+  exclusion_criteria:
+    - "Pure technical papers without ethical discussion"
+    - "HR software reviews without ethical analysis"
+    - "Opinion pieces without scholarly rigor"
+    - "Duplicate publications"
+
+screening:
+  model: "groq"
+  model_name: "llama-3.3-70b-versatile"
+  temperature: 0.1
+  human_verification_rate: 0.20  # 20% sample
+  target_kappa: 0.80
+
+rag:
+  embedding:
+    model: "all-MiniLM-L6-v2"
+    dimension: 384
+    batch_size: 32
+
+  chunking:
+    strategy: "recursive"
+    chunk_size: 1000
+    chunk_overlap: 200
+    separators: ["\n\n", "\n", ". ", " "]
+
+  retrieval:
+    default_k: 8
+    similarity_threshold: 0.7
+
+  vector_store:
+    type: "chromadb"
+    persist_directory: "./rag/chroma_db"
+    collection_name: "ai_ethics_hr"
+
+coding:
+  validation_phases: 6
+  models:
+    primary: "claude-3-5-sonnet-20241022"
+    verification: "gpt-4o"
+    efficiency: "llama-3.3-70b-versatile"
+
+  consensus:
+    threshold: "2_of_3"
+    critical_fields_require_unanimous:
+      - "fairness_bias.mentioned"
+      - "transparency.mentioned"
+      - "hr_function.primary"
+
+  human_sampling:
+    rate: 0.20
+    minimum_papers: 30
+    stratification:
+      - "ethics_principle_coverage"
+      - "hr_function_distribution"
+      - "confidence_quartiles"
+
+quality_gates:
+  icr_thresholds:
+    cohens_kappa_categorical: 0.85
+    weighted_kappa_ordinal: 0.80
+    krippendorff_alpha: 0.80
+    icc_continuous: 0.90
+
+  ai_human_thresholds:
+    overall_accuracy: 0.90
+    critical_field_accuracy: 0.95
+    per_field_minimum: 0.80
+
+  error_thresholds:
+    hallucination_rate: 0.02
+    extraction_miss_rate: 0.10
+    systematic_bias: 0.05
+
+output:
+  data_dir: "./data"
+  rag_dir: "./rag"
+  validation_dir: "./validation"
+  manuscript_dir: "./manuscript"
+
+  formats:
+    coded_data: "csv"
+    reliability_reports: "json"
+    analysis_outputs: ["csv", "png", "html"]
+
+logging:
+  level: "INFO"
+  audit_trail: true
+  audit_file: "./validation/audit_trail.jsonl"

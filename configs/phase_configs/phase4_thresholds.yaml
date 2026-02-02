@@ -1,0 +1,84 @@
+# Phase 4: Inter-Coder Reliability Thresholds
+phase: 4
+name: "Inter-Coder Reliability Calculation"
+
+metrics:
+  cohens_kappa:
+    description: "Binary/nominal categorical fields"
+    target: 0.85
+    acceptable: 0.80
+    fields:
+      - "ethical_issues.*.mentioned"
+      - "hr_function.primary"
+      - "theoretical_framework.applied"
+
+  weighted_kappa:
+    description: "Ordinal fields like severity"
+    target: 0.80
+    acceptable: 0.75
+    weighting: "quadratic"
+    fields:
+      - "ethical_issues.*.severity"
+
+  krippendorff_alpha:
+    description: "Multi-coder, mixed data types"
+    target: 0.80
+    acceptable: 0.75
+    fields:
+      - "ethical_issues.*.type"
+      - "ai_technology.type"
+
+  icc:
+    description: "Continuous fields"
+    target: 0.90
+    acceptable: 0.85
+    model: "ICC(2,1)"
+    fields:
+      - "confidence_scores.*"
+
+single_researcher_comparisons:
+  ai_human:
+    description: "AI consensus vs Human gold standard"
+    metric: "cohens_kappa"
+    target: 0.85
+
+  intra_rater:
+    description: "Human T1 vs Human T2 (2-week gap)"
+    metric: "cohens_kappa"
+    target: 0.90
+
+  claude_gpt:
+    description: "Claude vs GPT-4o agreement"
+    metric: "cohens_kappa"
+    target: 0.90
+
+  three_model:
+    description: "Claude + GPT-4o + Groq"
+    metric: "krippendorff_alpha"
+    target: 0.80
+
+field_level_targets:
+  ethics_mention_binary:
+    metric: "ai_human_kappa"
+    target: 0.85
+    acceptable: 0.80
+
+  ethics_severity_ordinal:
+    metric: "weighted_kappa"
+    target: 0.80
+    acceptable: 0.75
+
+  ethics_types_multi:
+    metric: "krippendorff_alpha"
+    target: 0.80
+    acceptable: 0.75
+
+  hr_function_nominal:
+    metric: "ai_human_kappa"
+    target: 0.85
+    acceptable: 0.80
+
+output:
+  directory: "./data/05_coded/phase4_reliability"
+  report_file: "icr_report.json"
+  matrix_file: "accuracy_matrix.csv"
