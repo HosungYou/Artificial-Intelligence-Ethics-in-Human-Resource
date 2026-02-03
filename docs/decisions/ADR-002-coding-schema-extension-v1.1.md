@@ -7,6 +7,21 @@
 
 ## Context
 
+### AI-Enabled Systematic Literature Review의 특성
+
+이 프로젝트는 **RAG(Retrieval-Augmented Generation) 기반 AI 코딩**을 활용한 체계적 문헌고찰입니다. 전통적인 인간 코딩과 달리, LLM을 활용한 코딩은 다음과 같은 가능성을 열어줍니다:
+
+| 전통적 인간 코딩 | AI-Enabled 코딩 |
+|-----------------|-----------------|
+| 논문당 10-15개 필드가 현실적 한계 | 논문당 30-40개 필드도 가능 |
+| Multi-select 필드 3-4개 이상 부담 | Multi-select 필드 제한 없음 |
+| 조건부 필드 관리 복잡 | 조건부 필드 자동 처리 |
+| 시간/비용으로 분석 범위 제한 | 복잡한 분류 체계 적용 가능 |
+
+이러한 AI 코딩의 장점을 활용하여, 기존에는 실현 불가능했던 수준의 세밀한 코딩 스키마를 설계할 수 있게 되었습니다.
+
+### 기존 스키마의 한계
+
 The initial coding schema (v1.0.0) captured basic information about AI ethics in HR literature:
 - HR functions
 - AI technology types
@@ -20,6 +35,13 @@ However, after reviewing the research goals and analysis requirements, we identi
 2. **No solution categorization**: Proposed solutions were captured in free-text only
 3. **No temporal structure**: Couldn't track how concepts evolved over the 2015-2025 period
 4. **Limited network analysis**: Needed structured data for co-occurrence analysis
+
+### AI 코딩이 가능하게 하는 확장
+
+AI 코딩 덕분에 다음과 같은 복잡한 필드 추가가 가능해졌습니다:
+- **Per-principle stance (6개 조건부 ordinal 필드)**: 인간 코더에게는 과도한 부담, LLM은 맥락 이해 후 일관되게 추출
+- **Solution taxonomy (24개 multi-select 옵션)**: 인간이 기억하기 어려운 분류 체계, LLM은 프롬프트로 일관 적용
+- **Temporal metadata (자동 파생)**: 출판년도에서 연구 시기 자동 계산
 
 ## Decision Drivers
 
