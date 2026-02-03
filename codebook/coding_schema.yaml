@@ -1,8 +1,9 @@
-# AI-Ethics-HR Coding Schema v1.0
+# AI-Ethics-HR Coding Schema v1.1
 # Schema for systematic coding of AI ethics in HR literature
+# Extended with stance classification, solution taxonomy, and temporal metadata
 
-version: "1.0.0"
-last_updated: "2026-02-02"
+version: "1.1.0"
+last_updated: "2026-02-03"
 description: "Standardized coding schema for AI ethics in human resource management systematic review"
 
 schema:
@@ -411,6 +412,216 @@ schema:
           description: "Global or worldwide scope"
         - value: "not_specified"
           description: "Geographic scope not specified"
+
+  # ============================================
+  # STANCE CLASSIFICATION (v1.1.0)
+  # Paper's position and argument style on AI ethics
+  # ============================================
+  stance_classification:
+    overall_tone:
+      type: "categorical"
+      required: true
+      description: "Overall stance of the paper toward AI in HR"
+      options:
+        - value: "AI_optimistic"
+          description: "Emphasizes benefits/opportunities of AI in HR, downplays risks"
+        - value: "AI_critical"
+          description: "Emphasizes risks/concerns of AI in HR, skeptical of benefits"
+        - value: "balanced"
+          description: "Presents both benefits and risks with equal weight"
+        - value: "neutral"
+          description: "Descriptive without normative position"
+
+    argument_basis:
+      type: "categorical"
+      required: true
+      description: "Primary basis for the paper's arguments"
+      options:
+        - value: "evidence_based"
+          description: "Arguments primarily supported by empirical data"
+        - value: "opinion_based"
+          description: "Arguments primarily based on expert opinion/theory"
+        - value: "mixed"
+          description: "Combination of evidence and opinion"
+
+    per_principle_stance:
+      description: "Stance toward each ethical principle (conditional: only when mentioned==true)"
+      fairness_bias:
+        type: "ordinal"
+        required: false
+        condition: "ethical_issues.fairness_bias.mentioned == true"
+        options:
+          - value: "concern_high"
+            level: 4
+            description: "Presents as critical/urgent concern"
+          - value: "concern_moderate"
+            level: 3
+            description: "Acknowledges concern with nuance"
+          - value: "concern_low"
+            level: 2
+            description: "Minimizes concern or views as manageable"
+          - value: "solution_focused"
+            level: 1
+            description: "Focuses on solutions rather than problems"
+      transparency:
+        type: "ordinal"
+        required: false
+        condition: "ethical_issues.transparency.mentioned == true"
+        options: "same_as_per_principle_stance.fairness_bias"
+      accountability:
+        type: "ordinal"
+        required: false
+        condition: "ethical_issues.accountability.mentioned == true"
+        options: "same_as_per_principle_stance.fairness_bias"
+      privacy:
+        type: "ordinal"
+        required: false
+        condition: "ethical_issues.privacy.mentioned == true"
+        options: "same_as_per_principle_stance.fairness_bias"
+      autonomy:
+        type: "ordinal"
+        required: false
+        condition: "ethical_issues.autonomy.mentioned == true"
+        options: "same_as_per_principle_stance.fairness_bias"
+      wellbeing:
+        type: "ordinal"
+        required: false
+        condition: "ethical_issues.wellbeing.mentioned == true"
+        options: "same_as_per_principle_stance.fairness_bias"
+
+  # ============================================
+  # SOLUTION TAXONOMY (v1.1.0)
+  # Classification of proposed solutions
+  # ============================================
+  solution_taxonomy:
+    solutions_proposed:
+      type: "boolean"
+      required: true
+      description: "Does the paper propose solutions to ethical challenges?"
+
+    technical_solutions:
+      type: "categorical"
+      required: false
+      multi_select: true
+      condition: "solution_taxonomy.solutions_proposed == true"
+      description: "Technical approaches to address AI ethics issues"
+      options:
+        - value: "algorithm_audit"
+          description: "Regular auditing of AI algorithms for bias/fairness"
+        - value: "explainable_AI"
+          description: "XAI techniques for interpretable decisions"
+        - value: "fairness_constraints"
+          description: "Mathematical fairness constraints in model training"
+        - value: "differential_privacy"
+          description: "Privacy-preserving techniques for data protection"
+        - value: "bias_detection"
+          description: "Tools and methods to detect bias in AI systems"
+        - value: "model_documentation"
+          description: "Model cards, datasheets, or other documentation"
+        - value: "human_AI_interface"
+          description: "Improved interfaces for human-AI interaction"
+        - value: "synthetic_data"
+          description: "Use of synthetic data to reduce bias"
+
+    organizational_solutions:
+      type: "categorical"
+      required: false
+      multi_select: true
+      condition: "solution_taxonomy.solutions_proposed == true"
+      description: "Organizational approaches to address AI ethics issues"
+      options:
+        - value: "human_oversight"
+          description: "Human review of AI decisions"
+        - value: "ethics_committee"
+          description: "Dedicated ethics review boards/committees"
+        - value: "training_programs"
+          description: "Training for HR professionals on AI ethics"
+        - value: "policy_development"
+          description: "Internal policies governing AI use"
+        - value: "stakeholder_engagement"
+          description: "Involving employees/candidates in AI design"
+        - value: "impact_assessment"
+          description: "Regular assessments of AI impact"
+        - value: "grievance_mechanism"
+          description: "Channels for employees to appeal AI decisions"
+        - value: "role_redesign"
+          description: "Restructuring HR roles for human-AI collaboration"
+
+    regulatory_solutions:
+      type: "categorical"
+      required: false
+      multi_select: true
+      condition: "solution_taxonomy.solutions_proposed == true"
+      description: "Regulatory/governance approaches to address AI ethics issues"
+      options:
+        - value: "legislation"
+          description: "Government laws and regulations"
+        - value: "industry_standards"
+          description: "Industry-developed standards and guidelines"
+        - value: "certification"
+          description: "Third-party certification of AI systems"
+        - value: "external_audit"
+          description: "Independent external auditing requirements"
+        - value: "regulatory_sandbox"
+          description: "Experimental regulatory frameworks"
+        - value: "disclosure_requirements"
+          description: "Mandatory disclosure of AI use to employees"
+
+    empirical_validation:
+      validated:
+        type: "boolean"
+        required: false
+        condition: "solution_taxonomy.solutions_proposed == true"
+        description: "Were proposed solutions empirically validated?"
+      validation_type:
+        type: "categorical"
+        required: false
+        multi_select: true
+        condition: "solution_taxonomy.empirical_validation.validated == true"
+        options:
+          - value: "experiment"
+            description: "Controlled experiment or A/B test"
+          - value: "case_study"
+            description: "Real-world case study implementation"
+          - value: "simulation"
+            description: "Simulation or synthetic evaluation"
+          - value: "survey"
+            description: "Survey of stakeholder perceptions"
+          - value: "field_study"
+            description: "Field deployment and evaluation"
+
+  # ============================================
+  # TEMPORAL METADATA (v1.1.0)
+  # Time-based classification for evolution tracking
+  # ============================================
+  temporal_metadata:
+    publication_quarter:
+      type: "categorical"
+      required: false
+      description: "Quarter of publication (derived from publication date)"
+      options:
+        - value: "Q1"
+          description: "January - March"
+        - value: "Q2"
+          description: "April - June"
+        - value: "Q3"
+          description: "July - September"
+        - value: "Q4"
+          description: "October - December"
+
+    research_period:
+      type: "categorical"
+      required: true
+      description: "Time period classification for trend analysis"
+      options:
+        - value: "2015_2017"
+          description: "Early period: foundational discussions"
+        - value: "2018_2020"
+          description: "Growth period: increasing awareness"
+        - value: "2021_2023"
+          description: "Maturation period: regulatory focus"
+        - value: "2024_2025"
+          description: "Current period: generative AI emergence"
 
   coding_metadata:
     coder_id:

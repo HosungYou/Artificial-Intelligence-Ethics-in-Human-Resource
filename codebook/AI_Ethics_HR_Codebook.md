@@ -227,6 +227,153 @@ Common frameworks in this domain:
 
 ---
 
+### 6. Stance Classification (NEW in v1.1)
+
+**Purpose**: Classify the paper's argumentative position toward AI in HR.
+
+#### 6.1 Overall Tone (Required)
+
+| Value | Definition | Indicators |
+|-------|------------|------------|
+| `AI_optimistic` | Emphasizes benefits, downplays risks | "opportunity", "potential", "innovation", positive framing |
+| `AI_critical` | Emphasizes risks, skeptical of benefits | "concerns", "dangers", "risks", cautionary framing |
+| `balanced` | Equal weight to benefits and risks | Explicit acknowledgment of both sides |
+| `neutral` | Descriptive without normative position | Objective, research-focused tone |
+
+**Coding Rules**:
+- Consider the OVERALL framing, not isolated statements
+- Look at abstract, introduction, and conclusion for clearest signals
+- "Balanced" requires explicit engagement with both perspectives
+
+#### 6.2 Argument Basis (Required)
+
+| Value | Definition | Indicators |
+|-------|------------|------------|
+| `evidence_based` | Arguments supported by empirical data | Statistics, experiments, survey data cited |
+| `opinion_based` | Arguments based on expert opinion/theory | "We argue", "It is believed", theoretical claims |
+| `mixed` | Combination of evidence and opinion | Both empirical and theoretical support |
+
+#### 6.3 Per-Principle Stance (Conditional)
+
+*Only coded when the corresponding ethical principle is mentioned (mentioned == true)*
+
+| Value | Level | Definition |
+|-------|-------|------------|
+| `concern_high` | 4 | Presents as critical/urgent concern requiring immediate action |
+| `concern_moderate` | 3 | Acknowledges concern with nuance and context |
+| `concern_low` | 2 | Minimizes concern or views as manageable with standard practices |
+| `solution_focused` | 1 | Focuses primarily on solutions rather than problems |
+
+**Coding Rules**:
+- Code separately for each of the 6 ethical principles
+- Only code if that principle is mentioned in the paper
+- Consider the dominant framing, not exceptional statements
+
+---
+
+### 7. Solution Taxonomy (NEW in v1.1)
+
+**Purpose**: Classify solutions proposed to address AI ethics challenges.
+
+#### 7.1 Solutions Proposed (Required)
+
+**Boolean**: Does the paper propose specific solutions to ethical challenges?
+
+**Coding Rules**:
+- Answer `true` if the paper offers concrete recommendations
+- General calls for "more research" do NOT count as solutions
+- Must be actionable recommendations
+
+#### 7.2 Technical Solutions (Multi-select)
+
+*Only coded when solutions_proposed == true*
+
+| Value | Definition | Examples |
+|-------|------------|----------|
+| `algorithm_audit` | Regular auditing of AI algorithms | "Regular fairness audits", "Algorithm testing" |
+| `explainable_AI` | XAI techniques for interpretability | "SHAP values", "LIME explanations" |
+| `fairness_constraints` | Mathematical fairness in training | "Demographic parity", "Equalized odds" |
+| `differential_privacy` | Privacy-preserving techniques | "Differential privacy", "Federated learning" |
+| `bias_detection` | Tools to detect bias | "Bias metrics", "Fairness dashboards" |
+| `model_documentation` | Documentation practices | "Model cards", "Datasheets" |
+| `human_AI_interface` | Improved interaction design | "User-friendly explanations", "Decision support" |
+| `synthetic_data` | Synthetic data for bias reduction | "Data augmentation", "Synthetic minority sampling" |
+
+#### 7.3 Organizational Solutions (Multi-select)
+
+*Only coded when solutions_proposed == true*
+
+| Value | Definition | Examples |
+|-------|------------|----------|
+| `human_oversight` | Human review of AI decisions | "Human-in-the-loop", "Manager review" |
+| `ethics_committee` | Ethics review boards | "AI ethics board", "Review committee" |
+| `training_programs` | Training for HR professionals | "AI literacy training", "Ethics workshops" |
+| `policy_development` | Internal AI use policies | "AI governance policy", "Usage guidelines" |
+| `stakeholder_engagement` | Involving employees in AI design | "Employee input", "Participatory design" |
+| `impact_assessment` | Regular AI impact assessments | "Algorithmic impact assessment", "Risk review" |
+| `grievance_mechanism` | Appeal channels for AI decisions | "Appeal process", "Challenge mechanism" |
+| `role_redesign` | HR role restructuring | "HR-AI collaboration roles", "Job redesign" |
+
+#### 7.4 Regulatory Solutions (Multi-select)
+
+*Only coded when solutions_proposed == true*
+
+| Value | Definition | Examples |
+|-------|------------|----------|
+| `legislation` | Government laws and regulations | "EU AI Act", "Employment law reform" |
+| `industry_standards` | Industry standards/guidelines | "ISO standards", "Industry best practices" |
+| `certification` | Third-party certification | "AI certification", "Ethical AI seal" |
+| `external_audit` | External auditing requirements | "Independent audit", "Third-party review" |
+| `regulatory_sandbox` | Experimental frameworks | "Regulatory sandbox", "Pilot programs" |
+| `disclosure_requirements` | Mandatory disclosure of AI use | "Transparency requirements", "Notice obligations" |
+
+#### 7.5 Empirical Validation (Conditional)
+
+*Only coded when solutions_proposed == true*
+
+**validated (Boolean)**: Were proposed solutions empirically tested?
+
+**validation_type (Multi-select)**:
+| Value | Definition |
+|-------|------------|
+| `experiment` | Controlled experiment or A/B test |
+| `case_study` | Real-world implementation case |
+| `simulation` | Simulation or synthetic evaluation |
+| `survey` | Survey of stakeholder perceptions |
+| `field_study` | Field deployment and evaluation |
+
+---
+
+### 8. Temporal Metadata (NEW in v1.1)
+
+**Purpose**: Enable time-based analysis and evolution tracking.
+
+#### 8.1 Publication Quarter (Optional)
+
+Derived automatically from publication date.
+
+| Value | Months |
+|-------|--------|
+| `Q1` | January - March |
+| `Q2` | April - June |
+| `Q3` | July - September |
+| `Q4` | October - December |
+
+#### 8.2 Research Period (Required)
+
+| Value | Years | Characteristics |
+|-------|-------|-----------------|
+| `2015_2017` | 2015-2017 | Early period: foundational discussions, limited empirical work |
+| `2018_2020` | 2018-2020 | Growth period: GDPR, increasing corporate awareness |
+| `2021_2023` | 2021-2023 | Maturation period: regulatory focus, EU AI Act drafting |
+| `2024_2025` | 2024-2025 | Current period: generative AI emergence, LLM applications |
+
+**Coding Rules**:
+- Use the publication year to determine period
+- This enables trend analysis across the review timeline
+
+---
+
 ## Quality Targets
 
 | Metric | Target | Acceptable |
@@ -278,6 +425,26 @@ theoretical_framework:
 
 key_findings:
   summary: "AI hiring tools showed significant racial bias in resume screening. Recommendations include regular audits and human oversight of AI decisions."
+
+stance_classification:
+  overall_tone: AI_critical
+  argument_basis: evidence_based
+  per_principle_stance:
+    fairness_bias: concern_high
+    transparency: concern_moderate
+
+solution_taxonomy:
+  solutions_proposed: true
+  technical_solutions: [algorithm_audit, bias_detection]
+  organizational_solutions: [human_oversight, impact_assessment]
+  regulatory_solutions: [external_audit]
+  empirical_validation:
+    validated: true
+    validation_type: [experiment]
+
+temporal_metadata:
+  publication_quarter: Q2
+  research_period: 2021_2023
 ```
 
 ### Example 2: People Analytics Privacy Paper
@@ -323,6 +490,97 @@ theoretical_framework:
 
 key_findings:
   summary: "Extensive employee monitoring raises significant privacy concerns. Organizations should implement transparent data practices and obtain meaningful consent."
+
+stance_classification:
+  overall_tone: balanced
+  argument_basis: mixed
+  per_principle_stance:
+    transparency: concern_moderate
+    accountability: concern_low
+    privacy: concern_high
+    autonomy: concern_moderate
+    wellbeing: concern_low
+
+solution_taxonomy:
+  solutions_proposed: true
+  technical_solutions: [differential_privacy, model_documentation]
+  organizational_solutions: [policy_development, stakeholder_engagement, grievance_mechanism]
+  regulatory_solutions: [legislation, disclosure_requirements]
+  empirical_validation:
+    validated: false
+
+temporal_metadata:
+  publication_quarter: Q3
+  research_period: 2021_2023
+```
+
+### Example 3: Generative AI in HR (Optimistic Perspective)
+
+**Title**: "ChatGPT for HR: Transforming Employee Experience Through AI Assistants"
+
+**Coding**:
+```yaml
+hr_function:
+  primary: employee_relations
+
+ai_technology:
+  types: [chatbot, generative_ai, nlp]
+  specific_tools: [ChatGPT, GPT-4]
+
+ethical_issues:
+  fairness_bias:
+    mentioned: true
+    types: [algorithmic_bias]
+    severity: mentioned
+  transparency:
+    mentioned: true
+    types: [explainability, communication_to_employees]
+    severity: discussed
+  accountability:
+    mentioned: false
+  privacy:
+    mentioned: true
+    types: [data_collection, consent]
+    severity: mentioned
+  autonomy:
+    mentioned: true
+    types: [human_in_the_loop]
+    severity: discussed
+  wellbeing:
+    mentioned: true
+    types: [employee_experience, job_quality]
+    severity: major_focus
+
+theoretical_framework:
+  applied: true
+  theory_name: "Technology Acceptance Model (TAM)"
+  category: technology_theories
+
+key_findings:
+  summary: "Generative AI chatbots significantly improved employee satisfaction with HR services. Implementation success depends on clear communication and maintaining human escalation paths."
+
+stance_classification:
+  overall_tone: AI_optimistic
+  argument_basis: evidence_based
+  per_principle_stance:
+    fairness_bias: concern_low
+    transparency: solution_focused
+    privacy: concern_low
+    autonomy: solution_focused
+    wellbeing: solution_focused
+
+solution_taxonomy:
+  solutions_proposed: true
+  technical_solutions: [human_AI_interface, explainable_AI]
+  organizational_solutions: [human_oversight, training_programs, policy_development]
+  regulatory_solutions: []
+  empirical_validation:
+    validated: true
+    validation_type: [survey, field_study]
+
+temporal_metadata:
+  publication_quarter: Q1
+  research_period: 2024_2025
 ```
 
 ---
@@ -332,3 +590,4 @@ key_findings:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-02-02 | Initial version |
+| 1.1 | 2026-02-03 | Added Stance Classification, Solution Taxonomy, and Temporal Metadata sections |

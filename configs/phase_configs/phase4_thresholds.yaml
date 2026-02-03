@@ -78,6 +78,47 @@ field_level_targets:
     target: 0.85
     acceptable: 0.80
 
+  # v1.1.0: New field reliability targets
+  stance_overall_nominal:
+    metric: "cohens_kappa"
+    target: 0.80
+    acceptable: 0.75
+
+  per_principle_stance_ordinal:
+    metric: "weighted_kappa"
+    weighting: "quadratic"
+    target: 0.75
+    acceptable: 0.70
+
+  solutions_proposed_binary:
+    metric: "cohens_kappa"
+    target: 0.90
+    acceptable: 0.85
+
+  technical_solutions_multi:
+    metric: "krippendorff_alpha"
+    level: "nominal"
+    target: 0.75
+    acceptable: 0.70
+
+  organizational_solutions_multi:
+    metric: "krippendorff_alpha"
+    level: "nominal"
+    target: 0.75
+    acceptable: 0.70
+
+  regulatory_solutions_multi:
+    metric: "krippendorff_alpha"
+    level: "nominal"
+    target: 0.75
+    acceptable: 0.70
+
+  # v1.1.0: New metrics for multi-select agreement
+  multi_select_metrics:
+    use_jaccard: true
+    jaccard_threshold: 0.60
+    use_dice: true
+
 output:
   directory: "./data/05_coded/phase4_reliability"
   report_file: "icr_report.json"

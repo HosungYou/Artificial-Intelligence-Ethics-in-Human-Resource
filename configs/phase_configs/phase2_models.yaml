@@ -41,11 +41,24 @@ consensus_rules:
     - "ethical_issues.fairness_bias.mentioned"
     - "ethical_issues.transparency.mentioned"
     - "hr_function.primary"
+    # v1.1.0: New critical fields
+    - "stance_classification.overall_tone"
+    - "solution_taxonomy.solutions_proposed"
 
   concordance_scoring:
     exact_match: 1.0
     partial_match: 0.5
     no_match: 0.0
+
+  # v1.1.0: Field-specific consensus rules
+  field_specific_rules:
+    stance_classification:
+      ordinal_fields:
+        - "per_principle_stance.*"
+      ordinal_tolerance: 1  # Allow 1-level difference for near-match
+    solution_taxonomy:
+      multi_select_consensus: "intersection"  # Consensus = common elements across models
+      minimum_overlap: 0.5  # At least 50% overlap for partial agreement
 
 discordance_handling:
   route_to_phase5: true

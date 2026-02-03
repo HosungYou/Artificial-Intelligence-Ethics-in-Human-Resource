@@ -20,6 +20,12 @@ confidence_thresholds:
   hr_function_categorical: 0.85
   theory_name_freetext: 0.70
   ai_technology_categorical: 0.80
+  # v1.1.0: New field thresholds
+  stance_overall_categorical: 0.75
+  stance_argument_basis: 0.70
+  per_principle_stance_ordinal: 0.70
+  solutions_proposed_boolean: 0.85
+  solution_types_multiselect: 0.70
 
 prompts:
   system: |

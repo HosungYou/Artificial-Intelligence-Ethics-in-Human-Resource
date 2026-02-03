@@ -297,3 +297,215 @@ def interpret_kappa(kappa: float) -> str:
         return "Substantial"
     else:
         return "Almost perfect"
+
+
+# ============================================
+# v1.1.0: Multi-select Agreement Metrics
+# ============================================
+
+def jaccard_similarity(set1: set, set2: set) -> float:
+    """
+    Calculate Jaccard similarity coefficient between two sets.
+
+    Jaccard = |intersection| / |union|
+
+    Args:
+        set1: First set of items
+        set2: Second set of items
+
+    Returns:
+        Jaccard coefficient (0 to 1)
+    """
+    if not set1 and not set2:
+        return 1.0  # Both empty = perfect agreement
+
+    if not set1 or not set2:
+        return 0.0  # One empty, one not = no agreement
+
+    intersection = len(set1 & set2)
+    union = len(set1 | set2)
+
+    return intersection / union if union > 0 else 0.0
+
+
+def dice_coefficient(set1: set, set2: set) -> float:
+    """
+    Calculate Dice coefficient (Sorensen-Dice) between two sets.
+
+    Dice = 2 * |intersection| / (|set1| + |set2|)
+
+    Args:
+        set1: First set of items
+        set2: Second set of items
+
+    Returns:
+        Dice coefficient (0 to 1)
+    """
+    if not set1 and not set2:
+        return 1.0
+
+    if not set1 or not set2:
+        return 0.0
+
+    intersection = len(set1 & set2)
+    total = len(set1) + len(set2)
+
+    return (2 * intersection) / total if total > 0 else 0.0
+
+
+def multi_select_agreement(
+    y1: List[List],
+    y2: List[List],
+    metric: str = 'jaccard'
+) -> Tuple[float, float]:
+    """
+    Calculate agreement for multi-select (set) fields across multiple items.
+
+    For each item, computes the similarity between two coders' selections,
+    then returns the mean and standard deviation.
+
+    Args:
+        y1: List of lists - each inner list is one coder's selections for an item
+        y2: List of lists - second coder's selections (same length as y1)
+        metric: 'jaccard' or 'dice'
+
+    Returns:
+        Tuple of (mean_agreement, std_agreement)
+    """
+    if len(y1) != len(y2):
+        raise ValueError("Rating lists must have equal length")
+
+    if len(y1) == 0:
+        return 0.0, 0.0
+
+    # Choose similarity function
+    if metric == 'jaccard':
+        sim_func = jaccard_similarity
+    elif metric == 'dice':
+        sim_func = dice_coefficient
+    else:
+        raise ValueError(f"Unknown metric: {metric}. Use 'jaccard' or 'dice'")
+
+    # Calculate per-item similarity
+    similarities = []
+    for items1, items2 in zip(y1, y2):
+        set1 = set(items1) if items1 else set()
+        set2 = set(items2) if items2 else set()
+        similarities.append(sim_func(set1, set2))
+
+    mean_sim = np.mean(similarities)
+    std_sim = np.std(similarities)
+
+    return float(mean_sim), float(std_sim)
+
+
+def multi_select_krippendorff(
+    data: List[List[List]],
+    level: str = 'nominal'
+) -> float:
+    """
+    Calculate Krippendorff's Alpha for multi-select fields.
+
+    Treats each possible value as a binary presence/absence variable
+    and computes alpha across all variables.
+
+    Args:
+        data: List of coders, each coder has a list of items,
+              each item is a list of selected values
+              data[coder][item] = [selected values]
+        level: 'nominal' (default) for multi-select
+
+    Returns:
+        Average alpha across all binary variables
+    """
+    n_coders = len(data)
+    n_items = len(data[0]) if data else 0
+
+    if n_items == 0 or n_coders < 2:
+        return 0.0
+
+    # Get all possible values across all coders and items
+    all_values = set()
+    for coder_data in data:
+        for item in coder_data:
+            if item:
+                all_values.update(item)
+
+    if not all_values:
+        return 0.0
+
+    # For each possible value, create binary ratings and compute alpha
+    alphas = []
+    for value in all_values:
+        # Create binary matrix: was this value selected?
+        binary_data = []
+        for coder_data in data:
+            coder_binary = []
+            for item in coder_data:
+                if item is None:
+                    coder_binary.append(None)
+                else:
+                    coder_binary.append(1 if value in item else 0)
+            binary_data.append(coder_binary)
+
+        # Compute alpha for this binary variable
+        alpha = krippendorff_alpha(binary_data, level='nominal')
+        alphas.append(alpha)
+
+    return float(np.mean(alphas)) if alphas else 0.0
+
+
+def ordinal_distance(v1: int, v2: int, n_levels: int) -> float:
+    """
+    Calculate normalized ordinal distance between two values.
+
+    Args:
+        v1: First ordinal value (1 to n_levels)
+        v2: Second ordinal value (1 to n_levels)
+        n_levels: Total number of ordinal levels
+
+    Returns:
+        Normalized distance (0 to 1)
+    """
+    if n_levels <= 1:
+        return 0.0
+    return abs(v1 - v2) / (n_levels - 1)
+
+
+def ordinal_agreement(
+    y1: List[int],
+    y2: List[int],
+    n_levels: int
+) -> Tuple[float, float]:
+    """
+    Calculate ordinal agreement with tolerance.
+
+    Returns both exact match rate and "close" match rate
+    (within 1 level).
+
+    Args:
+        y1: Ordinal ratings from rater 1
+        y2: Ordinal ratings from rater 2
+        n_levels: Number of ordinal levels
+
+    Returns:
+        Tuple of (exact_match_rate, close_match_rate)
+    """
+    if len(y1) != len(y2):
+        raise ValueError("Rating lists must have equal length")
+
+    if len(y1) == 0:
+        return 0.0, 0.0
+
+    exact_matches = 0
+    close_matches = 0
+
+    for a, b in zip(y1, y2):
+        if a == b:
+            exact_matches += 1
+            close_matches += 1
+        elif abs(a - b) <= 1:
+            close_matches += 1
+
+    n = len(y1)
+    return exact_matches / n, close_matches / n

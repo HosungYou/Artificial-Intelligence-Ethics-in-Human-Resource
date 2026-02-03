@@ -46,6 +46,12 @@ class Phase1CodingResult:
     theoretical_framework: FieldConfidence = None
     key_findings: FieldConfidence = None
 
+    # v1.1.0: New extracted fields
+    stance_classification: FieldConfidence = None
+    solution_taxonomy: FieldConfidence = None
+    per_principle_stance: Dict[str, FieldConfidence] = field(default_factory=dict)
+    temporal_metadata: Dict[str, str] = field(default_factory=dict)
+
     # Metadata
     total_chunks_retrieved: int = 0
     avg_confidence: float = 0.0
@@ -63,6 +69,12 @@ class Phase1CodingResult:
             'ethical_issues': {k: asdict(v) for k, v in self.ethical_issues.items()},
             'theoretical_framework': asdict(self.theoretical_framework) if self.theoretical_framework else None,
             'key_findings': asdict(self.key_findings) if self.key_findings else None,
+            # v1.1.0: New fields
+            'stance_classification': asdict(self.stance_classification) if self.stance_classification else None,
+            'solution_taxonomy': asdict(self.solution_taxonomy) if self.solution_taxonomy else None,
+            'per_principle_stance': {k: asdict(v) for k, v in self.per_principle_stance.items()},
+            'temporal_metadata': self.temporal_metadata,
+            # Metadata
             'total_chunks_retrieved': self.total_chunks_retrieved,
             'avg_confidence': self.avg_confidence,
             'low_confidence_fields': self.low_confidence_fields
@@ -187,6 +199,23 @@ Extract the following information with confidence scores (0.0-1.0). Be conservat
 
 5. **Key Findings**: Summarize main findings in 2-3 sentences.
 
+6. **Stance Classification** (NEW):
+   a) Overall Tone: AI_optimistic, AI_critical, balanced, neutral
+   b) Argument Basis: evidence_based, opinion_based, mixed
+   c) Per-Principle Stance (for each mentioned ethical principle):
+      - concern_high (4), concern_moderate (3), concern_low (2), solution_focused (1)
+
+7. **Solution Taxonomy** (NEW):
+   a) Solutions Proposed: true/false
+   b) If true, categorize solutions:
+      - Technical: algorithm_audit, explainable_AI, fairness_constraints, differential_privacy, bias_detection, model_documentation, human_AI_interface, synthetic_data
+      - Organizational: human_oversight, ethics_committee, training_programs, policy_development, stakeholder_engagement, impact_assessment, grievance_mechanism, role_redesign
+      - Regulatory: legislation, industry_standards, certification, external_audit, regulatory_sandbox, disclosure_requirements
+   c) Empirical Validation: validated (true/false), validation_type (experiment, case_study, simulation, survey, field_study)
+
+8. **Temporal Metadata** (NEW):
+   - Research Period: 2015_2017, 2018_2020, 2021_2023, 2024_2025 (based on publication year)
+
 RESPOND IN JSON FORMAT:
 {{
     "hr_function": {{
@@ -225,6 +254,35 @@ RESPOND IN JSON FORMAT:
     "key_findings": {{
         "summary": "2-3 sentences",
         "confidence": 0.0-1.0
+    }},
+    "stance_classification": {{
+        "overall_tone": "AI_optimistic|AI_critical|balanced|neutral",
+        "argument_basis": "evidence_based|opinion_based|mixed",
+        "confidence": 0.0-1.0,
+        "evidence": "quote or reasoning"
+    }},
+    "per_principle_stance": {{
+        "fairness_bias": "concern_high|concern_moderate|concern_low|solution_focused or null",
+        "transparency": "...",
+        "accountability": "...",
+        "privacy": "...",
+        "autonomy": "...",
+        "wellbeing": "..."
+    }},
+    "solution_taxonomy": {{
+        "solutions_proposed": true/false,
+        "technical_solutions": ["list of applicable solutions"],
+        "organizational_solutions": ["list"],
+        "regulatory_solutions": ["list"],
+        "empirical_validation": {{
+            "validated": true/false,
+            "validation_type": ["list"]
+        }},
+        "confidence": 0.0-1.0,
+        "evidence": "quote or reasoning"
+    }},
+    "temporal_metadata": {{
+        "research_period": "2015_2017|2018_2020|2021_2023|2024_2025"
     }}
 }}"""
 
@@ -339,14 +397,15 @@ class Phase1Coder:
 
         # Process extracted fields
         if extraction:
-            result = self._process_extraction(result, extraction)
+            result = self._process_extraction(result, extraction, paper)
 
         return result
 
     def _process_extraction(
         self,
         result: Phase1CodingResult,
-        extraction: Dict
+        extraction: Dict,
+        paper: Dict = None
     ) -> Phase1CodingResult:
         """Process raw extraction into structured result with confidence."""
 
@@ -415,6 +474,67 @@ class Phase1Coder:
                 reasoning=""
             )
 
+        # v1.1.0: Stance Classification
+        stance_data = extraction.get('stance_classification', {})
+        if stance_data:
+            result.stance_classification = FieldConfidence(
+                field_name='stance_classification',
+                value={
+                    'overall_tone': stance_data.get('overall_tone'),
+                    'argument_basis': stance_data.get('argument_basis')
+                },
+                confidence=stance_data.get('confidence', 0.5),
+                evidence_chunks=[stance_data.get('evidence', '')],
+                reasoning=stance_data.get('evidence', '')
+            )
+
+        # v1.1.0: Per-Principle Stance
+        per_stance_data = extraction.get('per_principle_stance', {})
+        for principle in self.ETHICS_PRINCIPLES:
+            stance_value = per_stance_data.get(principle)
+            if stance_value and stance_value != 'null':
+                result.per_principle_stance[principle] = FieldConfidence(
+                    field_name=f'per_principle_stance.{principle}',
+                    value=stance_value,
+                    confidence=0.7,  # Default confidence for derived field
+                    evidence_chunks=[],
+                    reasoning=""
+                )
+
+        # v1.1.0: Solution Taxonomy
+        solution_data = extraction.get('solution_taxonomy', {})
+        if solution_data:
+            result.solution_taxonomy = FieldConfidence(
+                field_name='solution_taxonomy',
+                value={
+                    'solutions_proposed': solution_data.get('solutions_proposed', False),
+                    'technical_solutions': solution_data.get('technical_solutions', []),
+                    'organizational_solutions': solution_data.get('organizational_solutions', []),
+                    'regulatory_solutions': solution_data.get('regulatory_solutions', []),
+                    'empirical_validation': solution_data.get('empirical_validation', {})
+                },
+                confidence=solution_data.get('confidence', 0.5),
+                evidence_chunks=[solution_data.get('evidence', '')],
+                reasoning=solution_data.get('evidence', '')
+            )
+
+        # v1.1.0: Temporal Metadata (derive from paper year if not extracted)
+        temporal_data = extraction.get('temporal_metadata', {})
+        paper_year = paper.get('year') if paper else None
+        if temporal_data.get('research_period'):
+            result.temporal_metadata['research_period'] = temporal_data['research_period']
+        elif paper_year:
+            # Derive research period from publication year
+            year = int(paper_year) if isinstance(paper_year, str) else paper_year
+            if year <= 2017:
+                result.temporal_metadata['research_period'] = '2015_2017'
+            elif year <= 2020:
+                result.temporal_metadata['research_period'] = '2018_2020'
+            elif year <= 2023:
+                result.temporal_metadata['research_period'] = '2021_2023'
+            else:
+                result.temporal_metadata['research_period'] = '2024_2025'
+
         # Calculate average confidence and identify low-confidence fields
         confidences = []
         low_conf_fields = []
@@ -423,7 +543,9 @@ class Phase1Coder:
             ('hr_function', result.hr_function),
             ('ai_technology', result.ai_technology),
             ('theoretical_framework', result.theoretical_framework),
-            ('key_findings', result.key_findings)
+            ('key_findings', result.key_findings),
+            ('stance_classification', result.stance_classification),
+            ('solution_taxonomy', result.solution_taxonomy)
         ]:
             if field_conf:
                 confidences.append(field_conf.confidence)
@@ -434,6 +556,11 @@ class Phase1Coder:
             confidences.append(field_conf.confidence)
             if field_conf.confidence < self.CONFIDENCE_THRESHOLD:
                 low_conf_fields.append(f'ethical_issues.{principle}')
+
+        for principle, field_conf in result.per_principle_stance.items():
+            confidences.append(field_conf.confidence)
+            if field_conf.confidence < self.CONFIDENCE_THRESHOLD:
+                low_conf_fields.append(f'per_principle_stance.{principle}')
 
         result.avg_confidence = sum(confidences) / len(confidences) if confidences else 0.0
         result.low_confidence_fields = low_conf_fields

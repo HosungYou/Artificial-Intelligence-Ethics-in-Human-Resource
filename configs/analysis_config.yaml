@@ -1,0 +1,168 @@
+# Analysis Configuration for AI Ethics in HR Review
+# Version: 1.1.0
+
+# Co-occurrence Network Analysis
+cooccurrence:
+  levels:
+    - principle  # 6 ethical principles
+    - subtype    # All subtypes across principles
+
+  network_analysis:
+    min_edge_weight: 1
+    centrality_metrics:
+      - degree
+      - betweenness
+      - eigenvector
+    community_detection: true
+
+  visualization:
+    heatmap:
+      colormap: "YlOrRd"
+      figsize: [10, 8]
+      annotate: true
+    network:
+      figsize: [12, 10]
+      layout: "spring"
+      node_scaling: 100  # Base multiplier for node size
+    interactive: true
+
+  output:
+    directory: "./output/analysis/cooccurrence"
+    formats:
+      - csv      # Matrices
+      - json     # Statistics
+      - png      # Static figures
+      - html     # Interactive figures
+
+# Evolution Tracking Analysis
+evolution:
+  periods:
+    - id: "2015_2017"
+      label: "2015-2017"
+      description: "Early period: foundational discussions"
+    - id: "2018_2020"
+      label: "2018-2020"
+      description: "Growth period: GDPR, increasing awareness"
+    - id: "2021_2023"
+      label: "2021-2023"
+      description: "Maturation period: regulatory focus"
+    - id: "2024_2025"
+      label: "2024-2025"
+      description: "Current period: generative AI emergence"
+
+  trend_analysis:
+    slope_threshold: 0.02  # Threshold for increasing/decreasing
+    confidence_level: 0.95
+
+  visualization:
+    ethics_evolution:
+      chart_type: "grouped_bar"
+      figsize: [12, 6]
+    stance_evolution:
+      chart_type: "line"
+      figsize: [10, 6]
+    solution_evolution:
+      chart_type: "grouped_bar"
+      figsize: [10, 6]
+    dashboard:
+      interactive: true
+
+  output:
+    directory: "./output/analysis/evolution"
+    formats:
+      - json     # Analysis results
+      - png      # Static figures
+      - html     # Dashboard
+
+# Publication Visualizations
+visualizations:
+  style:
+    figure_dpi: 300
+    font_family: "serif"
+    font_size: 11
+    title_size: 12
+    colormap: "Set2"
+
+  figures:
+    prisma_flow:
+      enabled: true
+      figsize: [12, 10]
+    hr_distribution:
+      enabled: true
+      figsize: [10, 6]
+      orientation: "horizontal"
+    ethics_hr_heatmap:
+      enabled: true
+      figsize: [12, 8]
+      colormap: "YlOrRd"
+    solution_treemap:
+      enabled: true
+      figsize: [14, 10]
+      interactive: true
+    stance_distribution:
+      enabled: true
+      figsize: [8, 8]
+      chart_type: "pie"
+
+  output:
+    directory: "./output/figures"
+    formats:
+      - png
+      - pdf  # For LaTeX inclusion
+      - html # Interactive versions
+
+# Color Schemes
+colors:
+  ethics_principles:
+    fairness_bias: "#e74c3c"
+    transparency: "#3498db"
+    accountability: "#2ecc71"
+    privacy: "#9b59b6"
+    autonomy: "#f39c12"
+    wellbeing: "#1abc9c"
+
+  hr_functions:
+    recruitment: "#264653"
+    selection: "#2a9d8f"
+    performance_management: "#e9c46a"
+    learning_development: "#f4a261"
+    people_analytics: "#e76f51"
+    employee_relations: "#8ecae6"
+    workforce_planning: "#219ebc"
+    compensation_benefits: "#023047"
+    multiple: "#a8dadc"
+
+  stances:
+    AI_optimistic: "#2ecc71"
+    AI_critical: "#e74c3c"
+    balanced: "#3498db"
+    neutral: "#95a5a6"
+
+  solutions:
+    technical: "#3498db"
+    organizational: "#2ecc71"
+    regulatory: "#e74c3c"
+
+# Analysis Pipeline
+pipeline:
+  # Run analyses in order
+  steps:
+    - name: "cooccurrence"
+      script: "scripts/06_analyze/cooccurrence_network.py"
+      enabled: true
+    - name: "evolution"
+      script: "scripts/06_analyze/evolution_tracking.py"
+      enabled: true
+    - name: "visualizations"
+      script: "scripts/06_analyze/visualizations.py"
+      enabled: true
+
+  # Input/output paths
+  input:
+    coded_data: "./data/05_coded/final/all_coded_papers.json"
+    prisma_counts: "./data/prisma_counts.json"
+
+  output:
+    base_directory: "./output/analysis"
+    figures_directory: "./output/figures"
+    report_file: "./output/analysis_report.json"
