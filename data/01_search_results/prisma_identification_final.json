@@ -1,0 +1,12 @@
+{
+  "identification_date": "2026-02-02T17:10:21.100093",
+  "total_records_identified": 7897,
+  "records_by_database": {
+    "scopus": 4851,
+    "web_of_science": 1307,
+    "pubmed": 437,
+    "eric": 302,
+    "semantic_scholar": 500,
+    "openalex": 500
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "search_date": "2026-02-02T16:58:15.038515",
+  "total_records_identified": 1000,
+  "records_by_database": {
+    "semantic_scholar": 500,
+    "openalex": 500,
+    "arxiv": 0
+  },
+  "query_used": "((\"artificial intelligence\" OR \"AI\" OR \"machine learning\" OR \"algorithm*\"\n OR \"automated\" OR \"chatbot\" OR \"NLP\" OR \"predictive analytics\")\nAND\n(\"human resource*\" OR \"HR\" OR \"HRM\" OR \"talent management\"\n OR \"recruitment\" OR \"selection\" OR \"hiring\" OR \"performance management\"\n OR \"learning and development\" OR \"training\" OR \"workforce analytics\"\n OR \"people analytics\" OR \"employee*\")\nAND\n(\"ethic*\" OR \"bias\" OR \"fairness\" OR \"discrimination\" OR \"transparency\"\n OR \"accountability\" OR \"privacy\" OR \"surveillance\" OR \"trust\"\n OR \"responsible AI\" OR \"algorithmic\"))\n"
+}

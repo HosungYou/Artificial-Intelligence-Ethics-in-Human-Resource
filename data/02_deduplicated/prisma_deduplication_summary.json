@@ -1,0 +1,18 @@
+{
+  "deduplication_date": "2026-02-02T17:11:36.339815",
+  "total_input": 7897,
+  "duplicates_removed": {
+    "by_doi": 714,
+    "by_title_similarity": 62,
+    "total": 776
+  },
+  "unique_papers": 7121,
+  "papers_by_source": {
+    "scopus": 4820,
+    "web_of_science": 702,
+    "semantic_scholar": 449,
+    "openalex": 471,
+    "pubmed": 390,
+    "eric": 289
+  }
+}
