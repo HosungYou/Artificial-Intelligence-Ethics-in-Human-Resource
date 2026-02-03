@@ -1,10 +1,10 @@
 # Product Requirements Document (PRD)
 ## AI Ethics in Human Resource: A RAG-Enabled Systematic Literature Review
 
-**Version**: 1.0.0
-**Date**: 2026-02-02
+**Version**: 1.1.0
+**Date**: 2026-02-03
 **Author**: Hosung You
-**Status**: Phase 1 - Infrastructure Complete
+**Status**: Phase 2 - Data Collection (Screening Complete)
 
 ---
 
@@ -20,9 +20,12 @@ Develop a comprehensive RAG-enabled systematic literature review examining AI et
 | Pipeline Scripts Complete | 11 | 11 | ✅ |
 | Configuration Files Complete | 7 | 7 | ✅ |
 | Documentation Complete | 5 | 5 | ✅ |
-| Database Searches Executed | 3 | 0 | ⏳ |
-| Papers Retrieved | 1,500-2,000 | 0 | ⏳ |
-| Papers Screened | 100% | 0% | ⏳ |
+| Database Searches Executed | 6 | 6 | ✅ |
+| Papers Retrieved | 1,500-2,000 | 7,897 | ✅ (exceeded) |
+| Papers After Deduplication | - | 7,121 | ✅ |
+| Papers Screened | 100% | 100% | ✅ |
+| Papers Included for Full-Text | 150-400 | 1,118 | ✅ |
+| Full-Text PDFs Downloaded | ≥60% | 0% | ⏳ |
 | Papers Coded | 100% | 0% | ⏳ |
 | Inter-Coder Reliability (κ) | ≥ 0.85 | TBD | ⏳ |
 | Manuscript Draft | 1 | 0 | ⏳ |
@@ -165,10 +168,11 @@ Develop a comprehensive RAG-enabled systematic literature review examining AI et
 ### Phase 2: Data Collection (Current ⏳)
 **Duration**: Week 2-4
 **Deliverables**:
-- [ ] Execute database searches
-- [ ] Run deduplication
-- [ ] Complete AI screening
-- [ ] Download full-text PDFs
+- [x] Execute database searches (Scopus: 4,851 | WoS: 1,307 | PubMed: 437 | ERIC: 302 | Semantic Scholar: 500 | OpenAlex: 500)
+- [x] Run deduplication (7,897 → 7,121, 776 duplicates removed)
+- [x] Complete AI screening (Include: 1,118 | Exclude: 5,836 | Uncertain: 167)
+- [ ] Human verification of screening sample (1,994 papers flagged)
+- [ ] Download full-text PDFs (50 Open Access, ~1,068 institutional access required)
 
 ### Phase 3: RAG & Coding (Upcoming)
 **Duration**: Week 4-8
@@ -223,10 +227,10 @@ Develop a comprehensive RAG-enabled systematic literature review examining AI et
 ## 9. Acceptance Criteria
 
 ### 9.1 Phase 2 Acceptance
-- [ ] ≥ 1,500 unique papers identified
-- [ ] Deduplication rate < 30%
-- [ ] Screening accuracy ≥ 90% vs human sample
-- [ ] ≥ 60% PDF retrieval rate
+- [x] ≥ 1,500 unique papers identified (7,121 achieved)
+- [x] Deduplication rate < 30% (9.8% achieved)
+- [ ] Screening accuracy ≥ 90% vs human sample (pending human verification)
+- [ ] ≥ 60% PDF retrieval rate (4.5% Open Access, need institutional access)
 
 ### 9.2 Phase 3 Acceptance
 - [ ] RAG retrieval precision ≥ 0.80
@@ -267,5 +271,44 @@ Develop a comprehensive RAG-enabled systematic literature review examining AI et
 
 *Document Control*
 *Created: 2026-02-02*
-*Last Updated: 2026-02-02*
-*Next Review: After Phase 2 completion*
+*Last Updated: 2026-02-03*
+*Next Review: After full-text PDF collection*
+
+---
+
+## Appendix A: PRISMA Flow Summary (Phase 2)
+
+```
+IDENTIFICATION
+├── Database Search (2026-02-02)
+│   ├── Scopus:           4,851
+│   ├── Web of Science:   1,307
+│   ├── PubMed:             437
+│   ├── ERIC:               302
+│   ├── Semantic Scholar:   500
+│   └── OpenAlex:           500
+│   └── TOTAL:            7,897
+│
+SCREENING
+├── Deduplication
+│   ├── DOI duplicates:     714
+│   ├── Title duplicates:    62
+│   └── UNIQUE:           7,121
+│
+├── AI-Assisted Screening (Groq llama-3.3-70b)
+│   ├── Included:         1,118 (15.7%)
+│   ├── Excluded:         5,836 (82.0%)
+│   └── Uncertain:          167 (2.3%)
+│
+└── Human Verification Sample: 1,994 (28.0% of total)
+
+ELIGIBILITY (Pending)
+├── Full-text PDF retrieval
+│   ├── Open Access available:   50 (4.5%)
+│   └── Institutional required: 1,068 (95.5%)
+│
+└── Full-text assessment: TBD
+
+INCLUDED (Pending)
+└── Studies in final review: TBD
+```

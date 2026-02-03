@@ -87,15 +87,15 @@ class SemanticScholarSearcher:
                         source="semantic_scholar",
                         source_id=item.get("paperId", ""),
                         title=item.get("title", ""),
-                        authors=[a.get("name", "") for a in item.get("authors", [])],
+                        authors=[a.get("name", "") for a in (item.get("authors") or [])],
                         year=item.get("year"),
                         abstract=item.get("abstract"),
-                        doi=item.get("externalIds", {}).get("DOI"),
+                        doi=(item.get("externalIds") or {}).get("DOI"),
                         url=item.get("url"),
                         pdf_url=item.get("openAccessPdf", {}).get("url") if item.get("openAccessPdf") else None,
                         venue=item.get("venue"),
                         citation_count=item.get("citationCount"),
-                        fields_of_study=[f.get("category", "") for f in item.get("fieldsOfStudy", []) if f]
+                        fields_of_study=[f if isinstance(f, str) else f.get("category", "") for f in (item.get("fieldsOfStudy") or []) if f]
                     )
                     papers.append(paper)
 
@@ -155,6 +155,14 @@ class OpenAlexSearcher:
                         if author.get("display_name"):
                             authors.append(author["display_name"])
 
+                    # Safely extract venue
+                    venue = None
+                    primary_loc = item.get("primary_location")
+                    if primary_loc:
+                        source = primary_loc.get("source")
+                        if source:
+                            venue = source.get("display_name")
+
                     paper = Paper(
                         source="openalex",
                         source_id=item.get("id", "").replace("https://openalex.org/", ""),
@@ -164,10 +172,10 @@ class OpenAlexSearcher:
                         abstract=item.get("abstract_inverted_index"),  # Needs reconstruction
                         doi=item.get("doi", "").replace("https://doi.org/", "") if item.get("doi") else None,
                         url=item.get("id"),
-                        pdf_url=item.get("open_access", {}).get("oa_url"),
-                        venue=item.get("primary_location", {}).get("source", {}).get("display_name") if item.get("primary_location") else None,
+                        pdf_url=(item.get("open_access") or {}).get("oa_url"),
+                        venue=venue,
                         citation_count=item.get("cited_by_count"),
-                        fields_of_study=[c.get("display_name", "") for c in item.get("concepts", [])[:5]]
+                        fields_of_study=[c.get("display_name", "") for c in (item.get("concepts") or [])[:5]]
                     )
 
                     # Reconstruct abstract from inverted index if present

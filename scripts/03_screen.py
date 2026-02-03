@@ -310,6 +310,8 @@ class ScreeningPipeline:
 
         # Over-sample low confidence papers
         def sample_by_confidence(group: List[ScreeningResult], n: int) -> List[ScreeningResult]:
+            if not group or n <= 0:
+                return []
             if len(group) <= n:
                 return group
 
@@ -321,12 +323,15 @@ class ScreeningPipeline:
             n_high = n - n_low
 
             mid = len(sorted_group) // 2
-            low_conf = sorted_group[:mid]
-            high_conf = sorted_group[mid:]
+            low_conf = sorted_group[:mid] if mid > 0 else sorted_group
+            high_conf = sorted_group[mid:] if mid < len(sorted_group) else []
 
             selected = []
-            selected.extend(random.sample(low_conf, min(n_low, len(low_conf))))
-            selected.extend(random.sample(high_conf, min(n_high, len(high_conf))))
+            if low_conf:
+                selected.extend(random.sample(low_conf, min(n_low, len(low_conf))))
+            if high_conf:
+                remaining = n - len(selected)
+                selected.extend(random.sample(high_conf, min(remaining, len(high_conf))))
 
             return selected[:n]
 
